@@ -1988,26 +1988,76 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     createUser: function createUser() {
-      this.$Progress.start();
-      this.form.post('api/user');
-      $('#addNewUser').modal('hide');
-      toast.fire({
-        type: 'success',
-        title: 'User created successfully'
+      var _this = this;
+
+      this.form.post('api/user').then(function () {
+        _this.$Progress.start();
+
+        _this.loadUser();
+
+        $('#addNewUser').modal('hide'); // Fire.$emit('AfterCreate');            
+
+        toast.fire({
+          type: 'success',
+          title: 'User created successfully'
+        });
+
+        _this.$Progress.finish();
+      }).catch(function () {
+        $('#addNewUser').modal('show');
       });
-      this.$Progress.finish();
     },
     loadUser: function loadUser() {
-      var _this = this;
+      var _this2 = this;
 
       axios.get('api/user').then(function (_ref) {
         var data = _ref.data;
-        return _this.users = data.data;
+        return _this2.users = data.data;
       });
+    },
+    deleteUser: function deleteUser(id) {
+      var _this3 = this;
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(function (result) {
+        if (result.value) {
+          // Send request to the server
+          _this3.form.delete('api/user/' + id).then(function () {
+            _this3.$Progress.start();
+
+            _this3.loadUser();
+
+            Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+
+            _this3.$Progress.finish();
+          }).catch(function () {
+            Swal("Failed!", "There was something wronge.", "warning");
+          });
+        }
+      });
+    },
+    newModal: function newModal() {
+      this.form.reset();
+      $('#addNewUser').modal('show');
+    },
+    editModal: function editModal(user) {
+      this.form.reset();
+      $('#addNewUser').modal('show');
+      this.form.fill(user);
     }
   },
   created: function created() {
-    this.loadUser();
+    this.loadUser(); // Fire.$on('AfterCreate', () => {
+    //     this.loadUser();
+    // });
+    // setInterval(() => this.loadUser(), 3000)
   }
 });
 
@@ -58417,14 +58467,31 @@ var render = function() {
     _c("div", { staticClass: "row mt-5" }, [
       _c("div", { staticClass: "col-md-12" }, [
         _c("div", { staticClass: "card" }, [
-          _vm._m(0),
+          _c("div", { staticClass: "card-header" }, [
+            _c("h3", { staticClass: "card-title" }, [_vm._v("Users Table")]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-tools" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary",
+                  attrs: { "data-toggle": "modal" },
+                  on: { click: _vm.newModal }
+                },
+                [
+                  _vm._v("Add User   "),
+                  _c("i", { staticClass: "fas fa-user-plus fa-fw" })
+                ]
+              )
+            ])
+          ]),
           _vm._v(" "),
           _c("div", { staticClass: "card-body table-responsive p-0" }, [
             _c("table", { staticClass: "table table-hover" }, [
               _c(
                 "tbody",
                 [
-                  _vm._m(1),
+                  _vm._m(0),
                   _vm._v(" "),
                   _vm._l(_vm.users, function(user, i) {
                     return _c("tr", [
@@ -58444,7 +58511,38 @@ var render = function() {
                         _vm._v(_vm._s(_vm._f("myDate")(user.created_at)))
                       ]),
                       _vm._v(" "),
-                      _vm._m(2, true)
+                      _c("td", [
+                        _c(
+                          "a",
+                          {
+                            attrs: { href: "#" },
+                            on: {
+                              click: function($event) {
+                                return _vm.editModal(user)
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "fas fa-edit blue" })]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "a",
+                          {
+                            attrs: { href: "#" },
+                            on: {
+                              click: function($event) {
+                                return _vm.deleteUser(user.id)
+                              }
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n                                          "
+                            ),
+                            _c("i", { staticClass: "fas fa-trash red" })
+                          ]
+                        )
+                      ])
                     ])
                   })
                 ],
@@ -58477,7 +58575,7 @@ var render = function() {
           },
           [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(3),
+              _vm._m(1),
               _vm._v(" "),
               _c(
                 "form",
@@ -58715,7 +58813,7 @@ var render = function() {
                     )
                   ]),
                   _vm._v(" "),
-                  _vm._m(4)
+                  _vm._m(2)
                 ]
               )
             ])
@@ -58726,28 +58824,6 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card-header" }, [
-      _c("h3", { staticClass: "card-title" }, [_vm._v("Users Table")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "card-tools" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-primary",
-            attrs: { "data-toggle": "modal", "data-target": "#addNewUser" }
-          },
-          [
-            _vm._v("Add User   "),
-            _c("i", { staticClass: "fas fa-user-plus fa-fw" })
-          ]
-        )
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -58764,21 +58840,6 @@ var staticRenderFns = [
       _c("th", [_vm._v("Created at")]),
       _vm._v(" "),
       _c("th", [_vm._v("Modify")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("a", { attrs: { href: "#" } }, [
-        _c("i", { staticClass: "fas fa-edit blue" })
-      ]),
-      _vm._v(" "),
-      _c("a", { attrs: { href: "#" } }, [
-        _vm._v("\n                                          "),
-        _c("i", { staticClass: "fas fa-trash red" })
-      ])
     ])
   },
   function() {
@@ -73684,6 +73745,8 @@ Vue.filter('upText', function (text) {
 Vue.filter('myDate', function (date) {
   return moment__WEBPACK_IMPORTED_MODULE_0___default()(date).format('MMMM Do YYYY');
 });
+var Fire = new Vue();
+window.Fire = Fire;
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

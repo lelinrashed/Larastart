@@ -11,7 +11,7 @@ import moment from 'moment'
 import { Form, HasError, AlertError } from 'vform'
 
 import Swal from 'sweetalert2'
-window.Swal = Swal
+window.Swal = Swal;
 
 const toast = Swal.mixin({
     toast: true,
@@ -19,21 +19,20 @@ const toast = Swal.mixin({
     showConfirmButton: false,
     timer: 3000
 });
-
-window.toast = toast
+window.toast = toast;
 
 window.Form = Form;
 Vue.component(HasError.name, HasError);
 Vue.component(AlertError.name, AlertError);
 import VueRouter from 'vue-router'
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 import VueProgressBar from 'vue-progressbar'
 Vue.use(VueProgressBar, {
     color: 'rgb(143, 255, 199)',
     failedColor: 'red',
     height: '3px'
-})
+});
 
 let routes = [
     { path: '/dashboard', component: require('./components/Dashboard.vue').default },
@@ -44,15 +43,19 @@ let routes = [
 const router = new VueRouter({
     mode: 'history',
     routes
-})
+});
 
 Vue.filter('upText', function(text) {
     return text.charAt(0).toUpperCase() + text.slice(1)
-})
+});
 
 Vue.filter('myDate', function(date) {
     return moment(date).format('MMMM Do YYYY');
-})
+});
+
+let Fire = new Vue()
+window.Fire = Fire;
+
 
 /**
  * The following block of code may be used to automatically register your

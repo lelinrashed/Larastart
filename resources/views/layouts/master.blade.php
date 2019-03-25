@@ -65,7 +65,7 @@
 					 with font-awesome or any other icon font library -->
 					<li class="nav-item">
 						<router-link to="/dashboard" class="nav-link">
-							<i class="nav-icon fas fa-tachometer-alt blue"></i>
+							<i class="nav-icon fas fa-tachometer-alt cyan"></i>
 							<p>
 								Dashboard
 							</p>
@@ -82,7 +82,7 @@
 						<ul class="nav nav-treeview">
 							<li class="nav-item">
 								<router-link to="/users" class="nav-link">
-									<i class="fas fa-user-alt indigo nav-icon"></i>
+									<i class="fas fa-user-alt teal nav-icon"></i>
 									<p>Users</p>
 								</router-link>
 							</li>
