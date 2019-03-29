@@ -19,7 +19,7 @@
 					<a class="nav-link" data-widget="pushmenu" href="#"><i class="fa fa-bars"></i></a>
 				</li>
 				<li class="nav-item d-none d-sm-inline-block">
-					<a href="index3.html" class="nav-link">Home</a>
+					<a href="/home" class="nav-link">Home</a>
 				</li>
 			</ul>
 
@@ -40,7 +40,7 @@
 		<!-- Main Sidebar Container -->
 		<aside class="main-sidebar sidebar-dark-primary elevation-4">
 			<!-- Brand Logo -->
-			<a href="index3.html" class="brand-link">
+			<a href="/home" class="brand-link">
 				<img src="{{ asset('img/logo.png') }}" alt="Larastart Logo" class="brand-image img-circle elevation-3"
 				style="opacity: 1">
 				<span class="brand-text font-weight-light">Larastart</span>
@@ -71,7 +71,8 @@
 							</p>
 						</router-link>
 					</li>
-					 <li class="nav-item has-treeview">
+					@can('isAdmin')
+					<li class="nav-item has-treeview">
 						<a href="#" class="nav-link">
 							<i class="nav-icon fas fa-cog green"></i>
 							<p>
@@ -86,14 +87,19 @@
 									<p>Users</p>
 								</router-link>
 							</li>
-							<li class="nav-item">
-								<a href="#" class="nav-link">
-									<i class="fa fa-circle-o nav-icon"></i>
-									<p>Inactive Page</p>
-								</a>
-							</li>
 						</ul>
 					</li>
+					@endcan
+					@can('isAdmin')
+					<li class="nav-item">
+						<router-link to="/developer" class="nav-link">
+							<i class="nav-icon fas fa-cogs purple"></i>
+							<p>
+								Developer
+							</p>
+						</router-link>
+					</li>
+					@endcan
 					<li class="nav-item">
 						<router-link to="/profile" class="nav-link">
 							<i class="nav-icon fas fa-user-alt orange"></i>
@@ -145,7 +151,11 @@
 <!-- ./wrapper -->
 
 <!-- REQUIRED SCRIPTS -->
-
+@auth
+	<script>		
+		window.user = @json(auth()->user())
+	</script>
+@endauth
 <script src="/js/app.js"></script>
 </body>
 </html>

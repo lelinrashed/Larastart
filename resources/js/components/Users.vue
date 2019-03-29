@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="row mt-5">
+        <div class="row mt-5" v-if="$gate.isAdmin()"ss>
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
@@ -48,12 +48,13 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalCenterTitle">Add New User</h5>
+                        <h5 v-show="!editmode" class="modal-title" id="exampleModalCenterTitle">Add New User</h5>
+                        <h5 v-show="editmode" class="modal-title" id="exampleModalCenterTitle">Update User's info</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form @submit.prevent="createUser">
+                    <form @submit.prevent="editmode ? updateUser() :createUser()">
                         <div class="modal-body">
                             <div class="form-group">
                                 <input v-model="form.name" placeholder="Name" type="text" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has('name') }">
@@ -83,7 +84,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-success">Create User</button>
+                            <button v-show="editmode" type="submit" class="btn btn-warning">Update User</button>
+                            <button v-show="!editmode" type="submit" class="btn btn-success">Create User</button>
                         </div>
                     </form>
                 </div>
@@ -95,8 +97,10 @@
 export default {
     data() {
         return {
+            editmode: false,
             users: {},
             form: new Form({
+                id: '',
                 name: '',
                 email: '',
                 password: '',
@@ -108,8 +112,8 @@ export default {
     },
     methods: {
         createUser() {
+            this.$Progress.start();
             this.form.post('api/user').then(() => {
-                    this.$Progress.start();
                     this.loadUser();
                     $('#addNewUser').modal('hide');
                     // Fire.$emit('AfterCreate');            
@@ -120,12 +124,15 @@ export default {
                     this.$Progress.finish();
                 })
                 .catch(() => {
+                    this.$Progress.fail();
                     $('#addNewUser').modal('show');
                 });
         },
         loadUser() {
-            axios.get('api/user')
-                .then(({ data }) => (this.users = data.data))
+            if (this.$gate.isAdmin()) {
+                axios.get('api/user')
+                    .then(({ data }) => (this.users = data.data))
+            }
         },
         deleteUser(id) {
             Swal.fire({
@@ -139,8 +146,8 @@ export default {
             }).then((result) => {
                 if (result.value) {
                     // Send request to the server
+                    this.$Progress.start();
                     this.form.delete('api/user/' + id).then(() => {
-                        this.$Progress.start();
                         this.loadUser();
                         Swal.fire(
                             'Deleted!',
@@ -149,19 +156,45 @@ export default {
                         )
                         this.$Progress.finish();
                     }).catch(() => {
-                        Swal("Failed!", "There was something wronge.", "warning");
+                        this.$Progress.fail();
+                        Swal.fire(
+                            'Error!',
+                            "Can't delete the user.",
+                            'error'
+                        )
                     });
                 }
             });
         },
         newModal() {
+            this.editmode = false;
+            this.form.clear();
             this.form.reset();
             $('#addNewUser').modal('show');
         },
         editModal(user) {
+            this.editmode = true;
+            this.form.clear();
             this.form.reset();
             $('#addNewUser').modal('show');
             this.form.fill(user);
+        },
+        updateUser() {
+            this.$Progress.start();
+            this.form.put('api/user/' + this.form.id)
+                .then(() => {
+                    this.loadUser();
+                    $('#addNewUser').modal('hide');
+                    toast.fire({
+                        type: 'success',
+                        title: 'User updated successfully'
+                    });
+                    this.$Progress.finish();
+                })
+                .catch(() => {
+                    this.$Progress.fail();
+
+                });
         }
     },
     created() {
